@@ -1,10 +1,3 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
 import React from 'react';
 import type {PropsWithChildren} from 'react';
 import {
@@ -15,15 +8,24 @@ import {
   Text,
   useColorScheme,
   View,
+  Button,
 } from 'react-native';
+import {Passkey} from 'react-native-passkey';
+import {PasskeyRegistrationRequest} from 'react-native-passkey/lib/typescript/Passkey';
+import {Colors} from 'react-native/Libraries/NewAppScreen';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+import AuthRequest from './__mocks__/AuthRequest.json';
+import RegRequest from './__mocks__/RegRequest.json';
+
+const registerWithPasskey = async (regRequest: PasskeyRegistrationRequest) => {
+  try {
+    console.log('Registering with Passkey reqest', regRequest);
+    const result = await Passkey.register(regRequest);
+    console.log('Registration result: ', result);
+  } catch (e) {
+    console.log('reg error', e);
+  }
+};
 
 type SectionProps = PropsWithChildren<{
   title: string;
@@ -57,7 +59,7 @@ function Section({children, title}: SectionProps): React.JSX.Element {
 
 function App(): React.JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
-
+  const isSupported: boolean = Passkey.isSupported();
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
@@ -71,25 +73,19 @@ function App(): React.JSX.Element {
       <ScrollView
         contentInsetAdjustmentBehavior="automatic"
         style={backgroundStyle}>
-        <Header />
         <View
           style={{
             backgroundColor: isDarkMode ? Colors.black : Colors.white,
           }}>
           <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
+            <Text style={styles.highlight}>Is Passkey Supportted: </Text>{' '}
+            {isSupported ? 'Yes' : 'No'}
+            <View>
+              <Button
+                onPress={() => registerWithPasskey(RegRequest)}
+                title="Register with Passkey"></Button>
+            </View>
           </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
         </View>
       </ScrollView>
     </SafeAreaView>
